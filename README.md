@@ -1,5 +1,5 @@
 # macfind
-mac address snmp get (cisco, dlink oids)
+mac address snmp get (cisco, dlink oids)  
 Получение таблицы мак адресов с коммутаторов посредством SNMP. На вход - ип и комьюнити, на выходе таблица маков.
 
 ## Hardware
