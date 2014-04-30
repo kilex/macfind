@@ -17,9 +17,8 @@ mac address snmp get (cisco, dlink oids)
 - DGS-1210
 
 ## use
-
-./find_dlink.pl 192.168.1.200 public  
 ```
+./find_dlink.pl 192.168.1.200 public  
 00016c012f34;Slot0/50;1  
 00037e004364;Slot0/52;2
 ...
