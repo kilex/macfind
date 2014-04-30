@@ -4,13 +4,15 @@ mac address snmp get (cisco, dlink oids)
 
 ## Hardware
 Скорее всего будет работать и на другом оборудовании этих вендоров, просто под рукой нет.
-### find_cisco.pl
+### find_cisco.pl  
 - 2960
 - 2970
 - 2950
-### find_cisco_old.pl
+ 
+### find_cisco_old.pl  
 - 2900
-### find_dlink.pl
+
+### find_dlink.pl  
 - DES-1210
 - DGS-1210
 
