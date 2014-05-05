@@ -4,6 +4,7 @@ use strict;
 my $ip=$ARGV[0];
 my $community=$ARGV[1];
 
+# Получаем имена интерфейсов
 my @ifname=`snmpwalk -v 2c -c $community $ip ifName`;
 my %names;
 foreach my $name (@ifname) {
@@ -11,21 +12,7 @@ foreach my $name (@ifname) {
     $names{$1}=$2;
 }
 
-my %ifindex;
-my @indexes=`snmpwalk -v 2c -c $community $ip SNMPv2-SMI::mib-2.47.1.1.1.1.6`;
-foreach my $index (@indexes) {
-    $index=~/SNMPv2-SMI::mib-2.47.1.1.1.1.6.(\d+) = INTEGER: (\d+)/;
-    $ifindex{$2}=$1;
-}
-
-my %miniifindex;
-my @miniindexes=`snmpwalk -v 2c -c $community $ip SNMPv2-SMI::mib-2.47.1.1.1.1.14`;
-foreach my $miniindex (@miniindexes) {
-    $miniindex=~/SNMPv2-SMI::mib-2.47.1.1.1.1.14.(\d+) = STRING: "(\d+)"/;
-    $miniifindex{$1}=$2;
-}
-
-
+# Получаем все комьюнити (виланы)
 my $getcommunites="snmpwalk -v 2c -c $community $ip SNMPv2-SMI::mib-2.47.1.2.1.1.4";
 my @rawcoms=`$getcommunites`;
 my @vlans;
@@ -33,7 +20,17 @@ foreach my $string (@rawcoms) {
 		$string=~/SNMPv2-SMI::mib-2.47.1.2.1.1.4.\d+ = STRING: "(.*)"/;
 		push @vlans,$1;
 }
+
 foreach my $vlan (@vlans){
+	# Получаем ифиндексы портов задействованных в этом вилане
+	my $cmdif="snmpwalk -v 2c -c $vlan $ip SNMPv2-SMI::mib-2.17.1.4.1.2";
+	my @rawif=`$cmdif`;
+	my %ifindex;
+	foreach my $row (@rawif) {
+		$row=~/SNMPv2-SMI::mib-2.17.1.4.1.2.(\d+) = INTEGER: (\d+)/;
+		$ifindex{$1}=$2;
+	}
+	# Запрашиваем мак таблицы
 	my $cmd="snmpwalk -v 2c -c $vlan $ip mib-2.17.4.3.1.2";
 	my @raw=`$cmd`;
 	if (@raw) {
@@ -49,8 +46,8 @@ foreach my $vlan (@vlans){
 		}
 		$vlan=~/@(\d+)/;
 		my $vlanid=$1;
-		my $portname=$names{$miniifindex{$ifindex{$port}}};
-		if ($mac) {print "$mac;$portname;$vlanid\n";}
+		my $portname=$names{$ifindex{$port}};
+		if ($mac && $portname) {print "$mac;$portname;$vlanid\n";}
 	}
 	}
 }
